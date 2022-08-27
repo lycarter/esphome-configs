@@ -1,0 +1,52 @@
+esphome:
+  name: testnode
+
+esp8266:
+  board: d1_mini
+
+# Enable logging
+logger:
+
+dallas:
+  - pin: D0
+    update_interval: 1s
+  - pin: D1
+    update_interval: 1s
+  - pin: D2
+    update_interval: 1s
+  - pin: D3
+    update_interval: 1s
+  - pin: D4
+    update_interval: 1s
+  - pin: D5
+    update_interval: 1s
+  - pin: D6
+    update_interval: 1s
+  - pin: D7
+    update_interval: 1s
+  - pin: D8
+    update_interval: 1s
+
+
+
+
+
+
+# Enable Home Assistant API
+api:
+  password: ""
+
+ota:
+  password: ""
+
+wifi:
+  ssid: "staly"
+  password: "1 am a tr33"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Testnode Fallback Hotspot"
+    password: "XjN1FPcXLJZO"
+
+captive_portal:
+    

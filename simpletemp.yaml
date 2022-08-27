@@ -1,0 +1,111 @@
+substitutions:
+  sensor_interval: 1s
+
+esphome:
+  name: testnode
+
+esp8266:
+  board: d1_mini
+
+# Enable logging
+logger:
+
+deep_sleep:
+  run_duration: 8s
+  sleep_duration: 5min
+  id: deep_sleep_1
+
+light:
+  - platform: binary
+    name: "built in LED"
+    output: custom_led_output
+    id: custom_led
+    restore_mode: ALWAYS_OFF
+
+output:
+  - id: custom_led_output
+    platform: gpio
+    pin:
+      number: GPIO2 # built-in LED
+      inverted: true
+
+mqtt:
+  broker: 192.168.1.114
+  port: 1883
+
+  on_message:
+    - topic: testnode/ota_mode
+      payload: 'ON'
+      then:
+        - deep_sleep.prevent: deep_sleep_1
+        - light.turn_on: custom_led
+    - topic: testnode/ota_mode
+      payload: 'OFF'
+      then:
+        - light.turn_off: custom_led
+        - deep_sleep.allow: deep_sleep_1
+        
+    - topic: testnode/sleep_mode
+      payload: 'ON'
+      then:
+        - light.turn_off: custom_led
+        - deep_sleep.enter: deep_sleep_1
+
+dallas:
+  - pin: D7
+    update_interval: $sensor_interval
+
+i2c:
+  sda: D2
+  scl: D1
+  # scan: false
+
+sensor:
+  - platform: dallas
+    address: 0x553cc4f648338328
+    name: "Wire Thermometer"
+  - platform: bme280
+    temperature:
+      name: "BME280 Temperature"
+      oversampling: 1x
+    pressure:
+      name: "BME280 Pressure"
+      oversampling: 1x
+    humidity:
+      name: "BME280 Humidity"
+      oversampling: 1x
+    address: 0x77
+    update_interval: $sensor_interval
+  - platform: uptime
+    name: Uptime Sensor
+    update_interval: $sensor_interval
+  - platform: wifi_signal
+    name: "WiFi Signal Sensor"
+    update_interval: $sensor_interval
+  - platform: adc
+    pin: A0
+    name: "battery voltage"
+    update_interval: $sensor_interval
+    filters:
+      # - multiply: 4.851 # 3.3 (internal voltage divider) * 1.47 (external voltage divider)
+      - multiply: 5.31 # 3.3 (internal voltage divider) * 1.47 (external voltage divider)
+
+# Enable Home Assistant API
+# api:
+#   password: ""
+
+ota:
+  password: ""
+
+wifi:
+  ssid: "staly"
+  password: "1 am a tr33"
+  fast_connect: true
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Testnode Fallback Hotspot"
+    password: "XjN1FPcXLJZO"
+
+captive_portal:
+    
